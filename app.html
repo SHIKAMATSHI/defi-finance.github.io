@@ -1,65 +1,157 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>DeFi Finance — App</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DEGI App</title>
+  <style>
+    /* خلفية متدرجة ومتحركة */
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%);
+      overflow: hidden;
+      color: white;
+    }
+
+    /* الشريط العلوي */
+    header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 50px;
+      padding: 20px;
+      background: rgba(20, 20, 20, 0.6);
+      backdrop-filter: blur(10px);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 10;
+      border-bottom: 1px solid rgba(255, 0, 0, 0.2);
+    }
+
+    header a {
+      text-decoration: none;
+      color: #bbb;
+      font-size: 1.1rem;
+      transition: color 0.3s, transform 0.3s;
+    }
+
+    header a:hover {
+      color: #ff2b2b;
+      transform: scale(1.1);
+    }
+
+    /* منطقة السواب */
+    .swap-container {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .swap-box {
+      position: relative;
+      z-index: 2;
+      background: rgba(20, 20, 20, 0.7);
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      border-radius: 20px;
+      padding: 40px;
+      width: 350px;
+      text-align: center;
+      box-shadow: 0 0 25px rgba(255, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .swap-box h2 {
+      color: #ff3b3b;
+      margin-bottom: 20px;
+    }
+
+    .swap-box input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    .swap-box button {
+      background: linear-gradient(90deg, #ff2b2b, #a00000);
+      border: none;
+      padding: 12px 40px;
+      border-radius: 25px;
+      font-size: 1rem;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 10px;
+    }
+
+    .swap-box button:hover {
+      background: linear-gradient(90deg, #ff4949, #c00000);
+      box-shadow: 0 0 15px #ff1b1b;
+    }
+
+    /* تأثير الغبار / الطاقة */
+    .particle {
+      position: absolute;
+      background: radial-gradient(circle, rgba(255, 0, 0, 0.6), transparent);
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: moveParticles 8s linear infinite;
+    }
+
+    @keyframes moveParticles {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(-100vh) scale(0.3);
+        opacity: 0;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="smoke-bg"></div>
-  <div class="smoke-layer"></div>
-
-  <header class="site-header">
-    <div class="logo">DeFi<span class="accent">X</span></div>
-    <div class="header-actions">
-      <button id="connect-btn-app" class="connect-btn">Connect Wallet</button>
-    </div>
+  <header>
+    <a href="#">Dashboard</a>
+    <a href="#">Earn</a>
+    <a href="#">Trade</a>
+    <a href="#">Task</a>
+    <a href="#">Docs</a>
   </header>
 
-  <main class="app-main">
-    <aside class="sidebar">
-      <nav>
-        <a href="#swap">Swap</a>
-        <a href="#earn">Earn</a>
-        <a href="#tasks">Tasks</a>
-        <a href="#dashboard">Dashboard</a>
-        <a href="#trade">Trade</a>
-        <a href="#docs">Docs</a>
-      </nav>
-    </aside>
-
-    <section class="app-content">
-      <h2>Welcome to DeFiX App</h2>
-      <p class="lead">This demo shows wallet connectivity and placeholders for DeFi features. Integrate smart contracts later via app.js</p>
-
-      <div class="cards-grid">
-        <div class="card-small">Swap (UI)</div>
-        <div class="card-small">Earn (UI)</div>
-        <div class="card-small">Tasks</div>
-        <div class="card-small">Dashboard</div>
-        <div class="card-small">Trade</div>
-        <div class="card-small">Docs</div>
-      </div>
-    </section>
-  </main>
-
-  <div id="wallet-modal" class="wallet-modal" aria-hidden="true">
-    <div class="modal-panel">
-      <button class="modal-close" id="modal-close-app">✕</button>
-      <h3>Connect Wallet</h3>
-      <div class="wallet-list">
-        <button data-wallet="metamask" class="wallet-item">MetaMask</button>
-        <button data-wallet="walletconnect" class="wallet-item">WalletConnect</button>
-        <button data-wallet="trust" class="wallet-item">Trust Wallet</button>
-        <button data-wallet="coinbase" class="wallet-item">Coinbase Wallet</button>
-        <button data-wallet="phantom" class="wallet-item">Phantom (Solana)</button>
-      </div>
+  <div class="swap-container" id="swap-area">
+    <div class="swap-box">
+      <h2>Swap</h2>
+      <input type="text" placeholder="From (Token)" />
+      <input type="text" placeholder="To (Token)" />
+      <button>Swap Now</button>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
-  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
-  <script src="app.js"></script>
+  <script>
+    // توليد جزيئات الغبار الحمراء المتحركة
+    const swapArea = document.getElementById("swap-area");
+    for (let i = 0; i < 80; i++) {
+      const p = document.createElement("div");
+      p.classList.add("particle");
+      p.style.left = Math.random() * 100 + "%";
+      p.style.top = Math.random() * 100 + "%";
+      p.style.animationDelay = Math.random() * 8 + "s";
+      p.style.width = p.style.height = Math.random() * 4 + 2 + "px";
+      swapArea.appendChild(p);
+    }
+  </script>
 </body>
 </html>
