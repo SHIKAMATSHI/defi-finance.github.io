@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DeFi Finance — App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="smoke-bg"></div>
+  <div class="smoke-layer"></div>
+
+  <header class="site-header">
+    <div class="logo">DeFi<span class="accent">X</span></div>
+    <div class="header-actions">
+      <button id="connect-btn-app" class="connect-btn">Connect Wallet</button>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <aside class="sidebar">
+      <nav>
+        <a href="#swap">Swap</a>
+        <a href="#earn">Earn</a>
+        <a href="#tasks">Tasks</a>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#trade">Trade</a>
+        <a href="#docs">Docs</a>
+      </nav>
+    </aside>
+
+    <section class="app-content">
+      <h2>Welcome to DeFiX App</h2>
+      <p class="lead">This demo shows wallet connectivity and placeholders for DeFi features. Integrate smart contracts later via app.js</p>
+
+      <div class="cards-grid">
+        <div class="card-small">Swap (UI)</div>
+        <div class="card-small">Earn (UI)</div>
+        <div class="card-small">Tasks</div>
+        <div class="card-small">Dashboard</div>
+        <div class="card-small">Trade</div>
+        <div class="card-small">Docs</div>
+      </div>
+    </section>
+  </main>
+
+  <div id="wallet-modal" class="wallet-modal" aria-hidden="true">
+    <div class="modal-panel">
+      <button class="modal-close" id="modal-close-app">✕</button>
+      <h3>Connect Wallet</h3>
+      <div class="wallet-list">
+        <button data-wallet="metamask" class="wallet-item">MetaMask</button>
+        <button data-wallet="walletconnect" class="wallet-item">WalletConnect</button>
+        <button data-wallet="trust" class="wallet-item">Trust Wallet</button>
+        <button data-wallet="coinbase" class="wallet-item">Coinbase Wallet</button>
+        <button data-wallet="phantom" class="wallet-item">Phantom (Solana)</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
