@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DeFi Finance — Landing</title>
+  <link rel="icon" href="#">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="smoke-bg"></div>
+  <div class="smoke-layer"></div>
+
+  <header class="site-header">
+    <div class="logo">DeFi<span class="accent">X</span></div>
+    <div class="header-actions">
+      <button id="connect-btn" class="connect-btn">Connect Wallet</button>
+    </div>
+  </header>
+
+  <main class="hero">
+    <div class="hero-card">
+      <h1>DeFi Finance — Smart Yield &amp; Swap</h1>
+      <p class="lead">A modern decentralized finance experience. Swap, Earn, Stake and manage your assets across EVM &amp; Solana wallets.</p>
+
+      <div class="hero-actions">
+        <a class="btn primary" href="app.html">Enter App</a>
+        <a class="btn ghost" href="#contacts">Contact</a>
+      </div>
+
+      <div id="socials" class="socials">
+        <a href="#" target="_blank">Twitter</a>
+        <a href="#" target="_blank">Discord</a>
+        <a href="#" target="_blank">Telegram</a>
+      </div>
+    </div>
+  </main>
+
+  <footer id="contacts">
+    <div class="footer-card">
+      <div>© <span id="year"></span> DeFiX</div>
+      <div class="small">Built for GitHub Pages — Frontend demo</div>
+    </div>
+  </footer>
+
+  <!-- modal & scripts -->
+  <div id="wallet-modal" class="wallet-modal" aria-hidden="true">
+    <div class="modal-panel">
+      <button class="modal-close" id="modal-close">✕</button>
+      <h3>Connect Wallet</h3>
+      <div class="wallet-list">
+        <button data-wallet="metamask" class="wallet-item">MetaMask</button>
+        <button data-wallet="walletconnect" class="wallet-item">WalletConnect</button>
+        <button data-wallet="trust" class="wallet-item">Trust Wallet</button>
+        <button data-wallet="coinbase" class="wallet-item">Coinbase Wallet</button>
+        <button data-wallet="phantom" class="wallet-item">Phantom (Solana)</button>
+      </div>
+      <div class="modal-note small">Make sure your wallet extension/mobile wallet is installed and unlocked.</div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
