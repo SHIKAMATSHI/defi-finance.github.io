@@ -1,420 +1,249 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>DEGI Swap - App</title>
-
-<!-- Ethers (MetaMask) + WalletConnect Provider -->
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
-
-<style>
-  :root{
-    --accent:#ff3b3b;
-    --muted:#bdbdbd;
-    --glass: rgba(20,20,20,0.6);
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:Inter, "Poppins", system-ui, Arial, sans-serif;background:#050506;color:#fff;overflow:hidden}
-
-  /* Background smoke & particles canvas */
-  #bgCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;background:radial-gradient(circle at center, #0a0a0a 0%, #000 70%);}
-  .smoke-layer{position:fixed;inset:-20% -20% -20% -20%;width:140%;height:140%;z-index:1;pointer-events:none;filter:blur(36px);opacity:0.85;
-    background:
-      radial-gradient(circle at 30% 80%, rgba(255,20,20,0.08), transparent 15%),
-      radial-gradient(circle at 70% 90%, rgba(0,0,0,0.8), transparent 30%),
-      radial-gradient(circle at 50% 100%, rgba(255,40,40,0.06), transparent 35%);
-    animation: drift 80s linear infinite;}
-  @keyframes drift{0%{transform:translate(0,0)}50%{transform:translate(-6%, -6%)}100%{transform:translate(0,-12%)}}
-
-  /* Header (logo left, controls right) */
-  header{position:fixed;top:0;left:0;right:0;height:68px;display:flex;align-items:center;justify-content:space-between;padding:12px 26px;z-index:20;backdrop-filter:blur(8px);background:linear-gradient(180deg, rgba(0,0,0,0.36), rgba(0,0,0,0.06));border-bottom:1px solid rgba(255,255,255,0.03)}
-  /* logo: D and e overlapped */
-  .logo{
-    display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:20px;line-height:1;
-  }
-  .logo .stacked{position:relative;width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#110101,#2b0000);display:flex;align-items:center;justify-content:center}
-  .logo .stacked .D{position:absolute;left:8px;top:4px;font-size:22px;color:#ffb4b4;font-weight:800;transform:translateY(-2px)}
-  .logo .stacked .e{position:absolute;right:8px;bottom:6px;font-size:20px;color:#fff;opacity:0.9}
-  .logo span{font-size:18px;color:#ddd;margin-left:6px}
-  /* right controls */
-  .controls{display:flex;align-items:center;gap:12px}
-  .network-select, .wallet-btn{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);padding:8px 12px;border-radius:10px;color:#ddd;cursor:pointer;backdrop-filter: blur(6px)}
-  .network-select:hover,.wallet-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,59,59,0.06)}
-  .small-link{color:#ddd;text-decoration:none;margin-left:12px;font-size:14px}
-
-  /* Main area */
-  main{position:relative;z-index:10;height:100vh;display:flex;align-items:center;justify-content:center;padding:90px 20px 40px;}
-
-  /* Swap card */
-  .card{
-    position:relative;width:420px;border-radius:18px;padding:22px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border:1px solid rgba(255,59,59,0.06);box-shadow:0 12px 50px rgba(0,0,0,0.7);backdrop-filter: blur(10px);
-  }
-  .card h3{margin:8px 0 6px;font-size:20px;color:var(--accent);text-shadow:0 0 16px rgba(255,59,59,0.12)}
-  .subtitle{color:#bfbfbf;font-size:13px;margin-bottom:12px}
-
-  .row-box{background:rgba(255,255,255,0.02);border-radius:12px;padding:12px;margin:12px 0;display:flex;align-items:center;gap:12px;border:1px solid rgba(255,255,255,0.02)}
-  .amount{font-size:28px;color:#fff;flex:1;text-align:left}
-  .token-btn{background:rgba(255,255,255,0.03);border:none;padding:8px 12px;border-radius:10px;color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px}
-  .token-btn small{opacity:0.9}
-
-  .percent-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-  .pct{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:6px 8px;border-radius:8px;color:#ffbcbc;cursor:pointer}
-  .pct:hover{background:rgba(255,59,59,0.12);color:#fff}
-
-  .swap-action{display:flex;gap:12px;align-items:center;margin-top:14px}
-  .swap-action .reverse{background:rgba(255,255,255,0.03);padding:8px;border-radius:10px;cursor:pointer}
-  .swap-btn{flex:1;background:linear-gradient(90deg,#ff3366,#c00000);border:none;padding:14px;border-radius:12px;color:#fff;font-weight:700;cursor:pointer}
-  .swap-btn:disabled{opacity:0.6;cursor:not-allowed}
-
-  /* token dropdown */
-  .tokens-list{position:absolute;z-index:30;left:0;top:0;background:rgba(10,10,10,0.95);border:1px solid rgba(255,255,255,0.04);padding:10px;border-radius:10px;min-width:180px;display:none;flex-direction:column;gap:8px}
-  .tokens-list .token-item{padding:8px;border-radius:8px;display:flex;align-items:center;gap:8px;cursor:pointer}
-  .tokens-list .token-item:hover{background:rgba(255,255,255,0.02)}
-
-  /* wallet menu */
-  .wallet-menu{position:absolute;background:rgba(10,10,10,0.96);border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:10px;display:none;right:14px;top:64px;z-index:40}
-  .wallet-menu button{display:block;width:140px;background:transparent;border:none;color:#fff;padding:8px;text-align:left;cursor:pointer;border-radius:8px}
-  .wallet-menu button:hover{background:rgba(255,255,255,0.02)}
-
-  /* responsive */
-  @media (max-width:520px){ .card{width:92%} header{padding:8px 10px} .logo span{display:none} }
-</style>
-</head>
-<body>
-
-<canvas id="bgCanvas"></canvas>
-<div class="smoke-layer"></div>
-
-<header>
-  <div class="logo">
-    <div class="stacked"><div class="D">D</div><div class="e">e</div></div>
-    <span>DegiSwap</span>
-  </div>
-
-  <div class="controls">
-    <div class="network-select" id="netSelect">Network: <strong id="netLabel">Ethereum</strong> ▾</div>
-    <div style="position:relative">
-      <button class="wallet-btn" id="connectBtn">Connect Wallet</button>
-      <div class="wallet-menu" id="walletMenu">
-        <button id="switchWalletBtn">Switch Wallet</button>
-        <button id="logoutBtn">Logout</button>
-      </div>
-    </div>
-  </div>
-</header>
-
-<main>
-  <div class="card" id="swapCard">
-    <h3>Swap</h3>
-    <div class="subtitle">Trade tokens instantly</div>
-
-    <!-- FROM -->
-    <div class="row-box" style="position:relative">
-      <div class="amount">
-        <input id="fromInput" type="number" step="any" min="0" placeholder="0.0" style="background:transparent;border:none;color:inherit;font-size:24px;width:100%;outline:none">
-      </div>
-      <button class="token-btn" id="fromTokenBtn"><small id="fromTokenLabel">ETH</small> ▾</button>
-
-      <!-- tokens dropdown (from) -->
-      <div class="tokens-list" id="fromTokens"></div>
-    </div>
-
-    <div class="percent-row">
-      <button class="pct" data-pct="10">10%</button>
-      <button class="pct" data-pct="25">25%</button>
-      <button class="pct" data-pct="50">50%</button>
-      <button class="pct" data-pct="70">70%</button>
-      <button class="pct" data-pct="100">100%</button>
-      <button class="pct" id="maxBtn">MAX</button>
-    </div>
-
-    <!-- To -->
-    <div class="row-box" style="position:relative;margin-top:14px">
-      <div class="amount">
-        <input id="toInput" type="number" step="any" min="0" placeholder="0.0" style="background:transparent;border:none;color:inherit;font-size:24px;width:100%;outline:none">
-      </div>
-      <button class="token-btn" id="toTokenBtn"><small id="toTokenLabel">DEGI</small> ▾</button>
-
-      <!-- tokens dropdown (to) -->
-      <div class="tokens-list" id="toTokens"></div>
-    </div>
-
-    <div class="swap-action">
-      <div class="reverse" id="reverseBtn">⇅</div>
-      <button class="swap-btn" id="doSwap">Connect Wallet</button>
-    </div>
-  </div>
-</main>
-
-<!-- network selection modal (simple) -->
-<div id="networkMenu" style="position:fixed;right:18px;top:76px;z-index:40;display:none;background:rgba(8,8,8,0.96);border-radius:10px;padding:8px;border:1px solid rgba(255,255,255,0.04)">
-  <div style="color:#ddd;margin-bottom:6px">Choose network</div>
-  <div style="display:flex;flex-direction:column;gap:6px">
-    <button class="netBtn" data-chain="0x1">Ethereum</button>
-    <button class="netBtn" data-chain="0x38">BSC</button>
-    <button class="netBtn" data-chain="0x89">Polygon</button>
-    <button class="netBtn" data-chain="0xa4b1">Arbitrum</button>
-  </div>
-</div>
-
-<script>
-/* ------------------------- BACKGROUND CANVAS (smoke + particles) ------------------------- */
-const canvas = document.getElementById('bgCanvas');
-const ctx = canvas.getContext('2d');
-function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
-resize(); window.addEventListener('resize', resize);
-
-const particles = [];
-function createParticles(n, speed=0.2, sizeRange=[0.8,3], color='rgba(255,59,59,0.6)'){
-  for(let i=0;i<n;i++){
-    particles.push({
-      x: Math.random()*canvas.width,
-      y: Math.random()*canvas.height,
-      r: sizeRange[0] + Math.random()*(sizeRange[1]-sizeRange[0]),
-      vx: (Math.random()-0.5)*speed,
-      vy: - (0.05 + Math.random()*speed),
-      col: color,
-      alpha: 0.4 + Math.random()*0.6
-    });
-  }
-}
-createParticles(120, 0.6, [0.8,3],'rgba(255,59,59,0.8)');
-
-function draw(){
-  // overlay (dark smoky tint)
-  ctx.fillStyle = 'rgba(6,6,6,0.25)';
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  // moving darker gradient (adds depth)
-  const g = ctx.createLinearGradient(0, canvas.height, canvas.width, 0);
-  g.addColorStop(0, 'rgba(10,0,0,0.12)');
-  g.addColorStop(1, 'rgba(0,0,0,0.5)');
-  ctx.fillStyle = g;
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  // draw particles
-  for(let p of particles){
-    ctx.beginPath();
-    ctx.fillStyle = p.col.replace(/[^,]+(?=\))/, p.alpha); // set alpha
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-    ctx.fill();
-    p.x += p.vx;
-    p.y += p.vy;
-    // wrap
-    if(p.y < -10){ p.y = canvas.height + 10; p.x = Math.random()*canvas.width; }
-    if(p.x < -10) p.x = canvas.width + 10;
-    if(p.x > canvas.width + 10) p.x = -10;
-  }
-  requestAnimationFrame(draw);
-}
-draw();
-
-/* ------------------------- UI: token selectors / dropdowns ------------------------- */
-const tokens = [
-  {symbol:'ETH', name:'Ethereum'},
-  {symbol:'USDT', name:'Tether'},
-  {symbol:'USDC', name:'USDC'},
-  {symbol:'DEGI', name:'DEGI Token'},
-  {symbol:'BTC', name:'Bitcoin'}
-];
-
-function buildTokenList(containerId, targetLabelId){
-  const container = document.getElementById(containerId);
-  container.innerHTML = '';
-  tokens.forEach(t=>{
-    const it = document.createElement('div');
-    it.className = 'token-item';
-    it.innerHTML = `<div style="font-weight:700">${t.symbol}</div><div style="opacity:0.7;margin-left:6px">${t.name}</div>`;
-    it.addEventListener('click', ()=>{
-      document.getElementById(targetLabelId).textContent = t.symbol;
-      container.style.display = 'none';
-    });
-    container.appendChild(it);
-  });
-}
-buildTokenList('fromTokens', 'fromTokenLabel');
-buildTokenList('toTokens', 'toTokenLabel');
-
-document.getElementById('fromTokenBtn').addEventListener('click', (e)=>{
-  const list = document.getElementById('fromTokens');
-  list.style.display = list.style.display==='flex'?'none':'flex';
-  list.style.left = (e.target.getBoundingClientRect().left - 150) + 'px';
-  list.style.top = (e.target.getBoundingClientRect().bottom + 8) + 'px';
-  list.style.position = 'absolute';
-});
-document.getElementById('toTokenBtn').addEventListener('click', (e)=>{
-  const list = document.getElementById('toTokens');
-  list.style.display = list.style.display==='flex'?'none':'flex';
-  list.style.left = (e.target.getBoundingClientRect().left - 150) + 'px';
-  list.style.top = (e.target.getBoundingClientRect().bottom + 8) + 'px';
-  list.style.position = 'absolute';
-});
-window.addEventListener('click', (ev)=>{
-  if(!ev.target.closest('.token-btn')){ document.getElementById('fromTokens').style.display='none'; document.getElementById('toTokens').style.display='none'; }
-});
-
-/* ------------------------- percent buttons / max behavior (mock balance) ------------------------- */
-let mockBalance = 12.3456; // mock user balance (ETH) - when connected replace with real
-document.querySelectorAll('.pct').forEach(b=>{
-  b.addEventListener('click', ()=>{
-    const pct = parseInt(b.getAttribute('data-pct')||'0');
-    const val = (mockBalance * (pct/100)).toFixed(6);
-    document.getElementById('fromInput').value = val;
-    // you could update toInput via price ratio later
-  });
-});
-document.getElementById('maxBtn').addEventListener('click', ()=>{
-  document.getElementById('fromInput').value = mockBalance.toFixed(6);
-});
-
-/* ------------------------- swap reverse ------------------------- */
-document.getElementById('reverseBtn').addEventListener('click', ()=>{
-  const from = document.getElementById('fromTokenLabel').textContent;
-  const to = document.getElementById('toTokenLabel').textContent;
-  document.getElementById('fromTokenLabel').textContent = to;
-  document.getElementById('toTokenLabel').textContent = from;
-  // swap inputs values
-  const v = document.getElementById('fromInput').value;
-  document.getElementById('fromInput').value = document.getElementById('toInput').value;
-  document.getElementById('toInput').value = v;
-});
-
-/* ------------------------- Wallet connect (MetaMask + WalletConnect) ------------------------- */
-let currentProvider = null;
-let signer = null;
-let ethersProvider = null;
-
-const connectBtn = document.getElementById('connectBtn');
-const walletMenu = document.getElementById('walletMenu');
-const switchWalletBtn = document.getElementById('switchWalletBtn');
-const logoutBtn = document.getElementById('logoutBtn');
-
-connectBtn.addEventListener('click', async (e)=>{
-  // if already connected, open small menu
-  if(currentProvider){
-    walletMenu.style.display = walletMenu.style.display==='block'?'none':'block';
-    return;
-  }
-  // show small choice modal (simple prompt)
-  const choice = prompt('Connect wallet: type "mm" for MetaMask or "wc" for WalletConnect', 'mm');
-  if(!choice) return;
-  if(choice.toLowerCase()==='mm') await connectMetaMask();
-  else if(choice.toLowerCase()==='wc') await connectWalletConnect();
-});
-
-switchWalletBtn.addEventListener('click', async ()=>{
-  walletMenu.style.display='none';
-  // simple: allow disconnect and reconnect a different wallet
-  await disconnectWallet();
-  const choice = prompt('Connect wallet: type "mm" for MetaMask or "wc" for WalletConnect', 'mm');
-  if(!choice) return;
-  if(choice.toLowerCase()==='mm') await connectMetaMask();
-  else if(choice.toLowerCase()==='wc') await connectWalletConnect();
-});
-
-logoutBtn.addEventListener('click', async ()=>{
-  walletMenu.style.display='none';
-  await disconnectWallet();
-});
-
-async function connectMetaMask(){
-  if(!window.ethereum){ alert('MetaMask not found'); return; }
-  try{
-    await window.ethereum.request({ method:'eth_requestAccounts' });
-    ethersProvider = new ethers.providers.Web3Provider(window.ethereum);
-    signer = ethersProvider.getSigner();
-    currentProvider = window.ethereum;
-    const addr = await signer.getAddress();
-    updateConnected(addr);
-    // listen for account change
-    window.ethereum.on('accountsChanged', (accs)=>{ if(accs.length===0) disconnectWallet(); else updateConnected(accs[0]); });
-    window.ethereum.on('chainChanged', ()=>{ location.reload(); });
-  }catch(e){ console.error(e); alert('User rejected.'); }
-}
-
-async function connectWalletConnect(){
-  try{
-    // NOTE: WalletConnect needs RPC mapping. These are public endpoints (may have rate limits).
-    const wcProvider = new WalletConnectProvider.default({
-      rpc: {
-        1: "https://cloudflare-eth.com",        // ethereum mainnet
-        56: "https://bsc-dataseed.binance.org", // bsc
-        137: "https://rpc-mainnet.maticvigil.com" // polygon (example)
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DegiSwap</title>
+    <style>
+      /* خلفية الدخان */
+      body {
+        margin: 0;
+        overflow: hidden;
+        height: 100vh;
+        background: radial-gradient(black 40%, #1a0000 100%);
+        color: white;
+        font-family: "Poppins", sans-serif;
       }
-    });
-    await wcProvider.enable();
-    ethersProvider = new ethers.providers.Web3Provider(wcProvider);
-    signer = ethersProvider.getSigner();
-    currentProvider = wcProvider;
-    const addr = await signer.getAddress();
-    updateConnected(addr);
-    // listen disconnect
-    wcProvider.on && wcProvider.on('disconnect', ()=>{ disconnectWallet(); });
-  }catch(e){ console.error(e); alert('WalletConnect failed'); }
-}
 
-async function disconnectWallet(){
-  try{
-    if(currentProvider && currentProvider.close) await currentProvider.close();
-  }catch(e){}
-  currentProvider = null; signer = null; ethersProvider = null;
-  connectBtn.textContent = 'Connect Wallet';
-  document.getElementById('doSwap').textContent = 'Connect Wallet';
-}
-
-/* update UI after connection */
-function updateConnected(address){
-  connectBtn.textContent = address.slice(0,6)+'...'+address.slice(-4);
-  document.getElementById('doSwap').textContent = 'Swap';
-  // optionally set mockBalance by reading on-chain balance (if ethersProvider available)
-  if(ethersProvider && signer){
-    ethersProvider.getBalance(address).then(b=>{
-      mockBalance = parseFloat(ethers.utils.formatEther(b));
-    }).catch(()=>{});
-  }
-}
-
-/* ------------------------- Network selector UI & switch (EVM) ------------------------- */
-const netSelect = document.getElementById('netSelect');
-const netLabel = document.getElementById('netLabel');
-const networkMenu = document.getElementById('networkMenu');
-
-netSelect.addEventListener('click', ()=>{ networkMenu.style.display = networkMenu.style.display==='block'?'none':'block'; });
-
-document.querySelectorAll('.netBtn').forEach(btn=>{
-  btn.addEventListener('click', async (e)=>{
-    const chain = btn.getAttribute('data-chain');
-    networkMenu.style.display='none';
-    const name = btn.textContent.trim();
-    netLabel.textContent = name;
-    // try to switch chain if MetaMask
-    if(currentProvider && currentProvider.request){
-      try{
-        await currentProvider.request({ method: 'wallet_switchEthereumChain', params:[{chainId: chain}] });
-      }catch(err){
-        console.warn('Switch chain error', err);
+      /* جزيئات */
+      canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 0;
       }
-    }
-  });
-});
 
-/* ------------------------- Swap button behavior (mock) ------------------------- */
-document.getElementById('doSwap').addEventListener('click', async ()=>{
-  if(!signer){ alert('Please connect your wallet first'); return; }
-  // mock: show confirm
-  const fromAmt = document.getElementById('fromInput').value || '0';
-  const fromTok = document.getElementById('fromTokenLabel').textContent;
-  const toTok = document.getElementById('toTokenLabel').textContent;
-  alert(`(Mock) Swap ${fromAmt} ${fromTok} → ${toTok}\nThis is a frontend demo. Integrate contract calls to execute.`);
-});
+      /* رأس الصفحة */
+      header {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 60px;
+        z-index: 10;
+      }
 
-/* ------------------------- small UX niceties ------------------------- */
-// close token menus on ESC
-window.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){ document.getElementById('fromTokens').style.display='none'; document.getElementById('toTokens').style.display='none'; walletMenu.style.display='none'; networkMenu.style.display='none'; }});
-</script>
+      .logo {
+        font-size: 2.3rem;
+        font-weight: bold;
+        color: #ff1b1b;
+        text-shadow: 0 0 15px red;
+      }
 
-</body>
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      button {
+        background: rgba(255, 0, 0, 0.1);
+        border: 1px solid rgba(255, 0, 0, 0.5);
+        color: #fff;
+        padding: 10px 18px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: 0.3s;
+        backdrop-filter: blur(6px);
+      }
+
+      button:hover {
+        background: rgba(255, 0, 0, 0.3);
+        box-shadow: 0 0 15px red;
+      }
+
+      .network-selector {
+        position: relative;
+      }
+
+      .network-dropdown {
+        position: absolute;
+        top: 45px;
+        right: 0;
+        background: rgba(20, 0, 0, 0.8);
+        border: 1px solid rgba(255, 0, 0, 0.4);
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 0 15px red;
+        display: none;
+      }
+
+      .network-selector:hover .network-dropdown {
+        display: block;
+      }
+
+      .network-dropdown div {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+
+      .network-dropdown div:hover {
+        background: rgba(255, 0, 0, 0.3);
+      }
+
+      /* صندوق السواب */
+      .swap-box {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(20, 0, 0, 0.6);
+        border: 1px solid rgba(255, 0, 0, 0.3);
+        border-radius: 20px;
+        padding: 25px;
+        width: 360px;
+        text-align: center;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 30px rgba(255, 0, 0, 0.2);
+        z-index: 10;
+      }
+
+      .swap-title {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #ff2a2a;
+        text-shadow: 0 0 15px #ff0000;
+        animation: glow 3s infinite alternate;
+      }
+
+      @keyframes glow {
+        from {
+          text-shadow: 0 0 10px #ff0000;
+        }
+        to {
+          text-shadow: 0 0 25px #ff5050;
+        }
+      }
+
+      .swap-input {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 0, 0, 0.3);
+        border-radius: 12px;
+        color: #fff;
+        font-size: 1rem;
+        padding: 12px;
+        width: 100%;
+        margin-top: 15px;
+        text-align: left;
+      }
+
+      .percent-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+      }
+
+      .percent-buttons button {
+        font-size: 0.7rem;
+        padding: 6px 8px;
+      }
+
+      .swap-btn {
+        width: 100%;
+        margin-top: 18px;
+        background: red;
+        color: white;
+        font-weight: bold;
+        font-size: 1rem;
+        text-transform: uppercase;
+        transition: 0.3s;
+      }
+
+      .swap-btn:hover {
+        background: darkred;
+        box-shadow: 0 0 15px red;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="particles"></canvas>
+
+    <header>
+      <div class="logo">Degi<span style="color:#fff;">Swap</span></div>
+      <div class="header-right">
+        <div class="network-selector">
+          <button>🌐 Network</button>
+          <div class="network-dropdown">
+            <div>💎 Ethereum</div>
+            <div>🟡 BNB</div>
+            <div>🟣 Polygon</div>
+            <div>🔺 Avalanche</div>
+            <div>⚪ Arbitrum</div>
+          </div>
+        </div>
+        <button>Connect Wallet</button>
+      </div>
+    </header>
+
+    <div class="swap-box">
+      <div class="swap-title">SWAP</div>
+      <input type="text" class="swap-input" placeholder="From" />
+      <input type="text" class="swap-input" placeholder="To" />
+
+      <div class="percent-buttons">
+        <button>10%</button>
+        <button>25%</button>
+        <button>50%</button>
+        <button>75%</button>
+        <button>MAX</button>
+      </div>
+
+      <button class="swap-btn">Swap</button>
+    </div>
+
+    <script>
+      const canvas = document.getElementById("particles");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const particles = [];
+      const particleCount = 150;
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 2,
+          dx: (Math.random() - 0.5) * 0.3,
+          dy: (Math.random() - 0.5) * 0.3,
+          color: `rgba(${150 + Math.random() * 100},0,0,${Math.random()})`,
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let p of particles) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+
+          p.x += p.dx;
+          p.y += p.dy;
+
+          if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+        }
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    </script>
+  </body>
 </html>
+
+   
