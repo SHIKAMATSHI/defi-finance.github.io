@@ -1,66 +1,245 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>DeFi Finance — Landing</title>
-  <link rel="icon" href="#">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DEGI Finance</title>
+  <style>
+    /* --- RESET --- */
+    * {margin: 0; padding: 0; box-sizing: border-box;}
+    body, html {
+      width: 100%; height: 100%;
+      overflow-x: hidden;
+      font-family: "Poppins", sans-serif;
+      background: radial-gradient(circle at bottom, #2a2a2a 0%, #0b0b0b 70%);
+      color: white;
+      position: relative;
+    }
+
+    /* --- ANIMATED PARTICLES --- */
+    canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+    }
+
+    /* --- HEADER --- */
+    header {
+      position: fixed;
+      top: 0; right: 0;
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 20px 50px;
+      z-index: 10;
+      background: rgba(0,0,0,0.1);
+      backdrop-filter: blur(6px);
+    }
+    header a {
+      color: #ff3b3b;
+      text-decoration: none;
+      margin: 0 10px;
+      font-size: 18px;
+      transition: 0.3s;
+    }
+    header a:hover { color: #fff; }
+
+    .open-app {
+      margin-left: 20px;
+      background: rgba(255, 59, 59, 0.15);
+      border: 1px solid rgba(255, 59, 59, 0.6);
+      border-radius: 20px;
+      padding: 8px 18px;
+      color: #fff;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.4s;
+      box-shadow: 0 0 8px rgba(255,59,59,0.3);
+    }
+    .open-app:hover {
+      background: rgba(255, 59, 59, 0.4);
+      transform: scale(1.05);
+      box-shadow: 0 0 16px rgba(255,59,59,0.6);
+    }
+
+    /* --- MAIN CONTENT --- */
+    .main {
+      position: relative;
+      z-index: 5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    .main h1 {
+      font-size: 4rem;
+      color: #ff4a4a;
+      text-shadow: 0 0 30px rgba(255,59,59,0.7);
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+    .main h2 {
+      font-size: 1.5rem;
+      opacity: 0.9;
+      margin-bottom: 40px;
+    }
+
+    /* --- TYPEWRITER EFFECT --- */
+    #typewriter {
+      font-size: 1.3rem;
+      max-width: 700px;
+      border-right: 3px solid #ff4a4a;
+      white-space: nowrap;
+      overflow: hidden;
+      animation: typing 6s steps(60, end), blink 0.8s infinite;
+    }
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+    @keyframes blink {
+      50% { border-color: transparent }
+    }
+
+    /* --- SCROLL DOWN ICON --- */
+    .scroll-down {
+      position: absolute;
+      bottom: 40px;
+      animation: bounce 2s infinite;
+      cursor: pointer;
+      font-size: 2rem;
+      color: #ff4a4a;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* --- ABOUT SECTION --- */
+    .about {
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      padding: 100px 20px;
+      text-align: center;
+    }
+    .about h3 {
+      color: #ff4a4a;
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+    .about p {
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.8;
+      font-size: 1.1rem;
+      color: #ddd;
+    }
+
+  </style>
 </head>
 <body>
-  <div class="smoke-bg"></div>
-  <div class="smoke-layer"></div>
+  <canvas id="particles"></canvas>
 
-  <header class="site-header">
-    <div class="logo">DeFi<span class="accent">X</span></div>
-    <div class="header-actions">
-      <button id="connect-btn" class="connect-btn">Connect Wallet</button>
-    </div>
+  <header>
+    <a href="https://twitter.com/">Twitter</a>
+    <a href="https://discord.com/">Discord</a>
+    <a href="https://t.me/">Telegram</a>
+    <button class="open-app">Open App</button>
   </header>
 
-  <main class="hero">
-    <div class="hero-card">
-      <h1>DeFi Finance — Smart Yield &amp; Swap</h1>
-      <p class="lead">A modern decentralized finance experience. Swap, Earn, Stake and manage your assets across EVM &amp; Solana wallets.</p>
-
-      <div class="hero-actions">
-        <a class="btn primary" href="app.html">Enter App</a>
-        <a class="btn ghost" href="#contacts">Contact</a>
-      </div>
-
-      <div id="socials" class="socials">
-        <a href="#" target="_blank">Twitter</a>
-        <a href="#" target="_blank">Discord</a>
-        <a href="#" target="_blank">Telegram</a>
-      </div>
-    </div>
-  </main>
-
-  <footer id="contacts">
-    <div class="footer-card">
-      <div>© <span id="year"></span> DeFiX</div>
-      <div class="small">Built for GitHub Pages — Frontend demo</div>
-    </div>
-  </footer>
-
-  <!-- modal & scripts -->
-  <div id="wallet-modal" class="wallet-modal" aria-hidden="true">
-    <div class="modal-panel">
-      <button class="modal-close" id="modal-close">✕</button>
-      <h3>Connect Wallet</h3>
-      <div class="wallet-list">
-        <button data-wallet="metamask" class="wallet-item">MetaMask</button>
-        <button data-wallet="walletconnect" class="wallet-item">WalletConnect</button>
-        <button data-wallet="trust" class="wallet-item">Trust Wallet</button>
-        <button data-wallet="coinbase" class="wallet-item">Coinbase Wallet</button>
-        <button data-wallet="phantom" class="wallet-item">Phantom (Solana)</button>
-      </div>
-      <div class="modal-note small">Make sure your wallet extension/mobile wallet is installed and unlocked.</div>
-    </div>
+  <div class="main">
+    <h1>DEGI Finance</h1>
+    <h2>The Future of Decentralized Wealth</h2>
+    <div id="typewriter"></div>
+    <div class="scroll-down" onclick="scrollToAbout()">⬇️</div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
-  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
-  <script src="app.js"></script>
+  <section class="about" id="about">
+    <h3>About DEGI</h3>
+    <p>
+      DEGI is a decentralized finance (DeFi) protocol redefining digital finance through smart, automated solutions.
+      It empowers users to trade, earn, and manage assets with full transparency and freedom — without intermediaries.
+      Built on blockchain technology, DEGI combines simplicity, speed, and security for the next generation of financial innovation.
+    </p>
+  </section>
+
+  <script>
+    // --- PARTICLES BACKGROUND ---
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particlesArray = [];
+    const colors = ['rgba(255,59,59,0.6)', 'rgba(255,59,59,0.3)'];
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2;
+        this.speedX = (Math.random() - 0.5) * 0.3;
+        this.speedY = (Math.random() - 0.5) * 0.3;
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+    }
+
+    function init() {
+      for (let i = 0; i < 150; i++) {
+        particlesArray.push(new Particle());
+      }
+    }
+
+    function animate() {
+      ctx.fillStyle = "rgba(10,10,10,0.2)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      particlesArray.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+
+    init();
+    animate();
+
+    // --- TYPEWRITER EFFECT ---
+    const text = "Welcome to DEGI — The Future of Decentralized Finance.";
+    let i = 0;
+    function typing() {
+      if (i < text.length) {
+        document.getElementById("typewriter").textContent += text.charAt(i);
+        i++;
+        setTimeout(typing, 50);
+      }
+    }
+    window.onload = typing;
+
+    // --- SCROLL FUNCTION ---
+    function scrollToAbout() {
+      document.getElementById("about").scrollIntoView({ behavior: "smooth" });
+    }
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
 </body>
 </html>
