@@ -1,0 +1,276 @@
+:root {
+  --accent: #ff4242;
+  --muted: #bdbdbd;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  background: #000;
+  color: #fff;
+}
+
+/* الخلفية الدخانية */
+.smoke-bg, .smoke-layer {
+  position: fixed;
+  inset: -25% -25% -25% -25%;
+  width: 150%;
+  height: 150%;
+  filter: blur(30px) saturate(1.05);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.smoke-bg {
+  background: radial-gradient(circle at top left, rgba(150, 0, 0, 0.45), transparent 30%),
+              radial-gradient(circle at bottom left, rgba(220, 220, 220, 0.35), transparent 50%),
+              radial-gradient(circle at top right, rgba(80, 80, 80, 0.45), transparent 60%),
+              #000;
+  mix-blend-mode: screen;
+  animation: move1 80s linear infinite;
+  opacity: 0.9;
+}
+
+.smoke-layer {
+  background: radial-gradient(circle at bottom right, rgba(230,230,230,0.22), transparent 40%),
+              radial-gradient(circle at left center, rgba(255,40,40,0.18), transparent 55%),
+              #000;
+  mix-blend-mode: lighten;
+  animation: move2 110s linear infinite reverse;
+  opacity: 0.7;
+}
+
+@keyframes move1 {
+  0% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(-15%,-10%) scale(1.08); }
+  100% { transform: translate(0,-25%) scale(1.12); }
+}
+
+@keyframes move2 {
+  0% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(10%,-5%) scale(1.04); }
+  100% { transform: translate(0,-30%) scale(1.08); }
+}
+
+/* الرأس */
+.site-header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 28px;
+}
+
+.logo {
+  font-weight: 800;
+  font-size: 20px;
+}
+
+.logo .accent {
+  color: var(--accent);
+}
+
+.connect-btn {
+  background: linear-gradient(90deg, var(--accent), #ff7b7b);
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(255,66,66,0.12);
+}
+
+/* القسم الرئيسي */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 75vh;
+  padding: 20px;
+}
+
+.hero-card {
+  position: relative;
+  z-index: 10;
+  background: rgba(255,255,255,0.03);
+  border-radius: 14px;
+  padding: 36px;
+  max-width: 900px;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.04);
+  backdrop-filter: blur(6px);
+}
+
+.hero-card h1 {
+  margin: 0 0 10px;
+  font-size: 34px;
+}
+
+.lead {
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 18px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 18px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #111;
+  font-weight: 700;
+}
+
+.btn.primary {
+  background: linear-gradient(90deg, var(--accent), #ff8a8a);
+}
+
+.btn.ghost {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #fff;
+}
+
+.socials {
+  margin-top: 18px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.socials a {
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+}
+
+/* الفوتر */
+footer {
+  position: relative;
+  z-index: 10;
+  padding: 18px 28px;
+  color: #bbb;
+}
+
+.footer-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.small {
+  font-size: 13px;
+  color: #bbb;
+}
+
+/* نافذة المحافظ */
+.wallet-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.4);
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: all .25s;
+}
+
+.wallet-modal[aria-hidden="false"] {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-panel {
+  width: 420px;
+  background: rgba(10,10,10,0.7);
+  border-radius: 12px;
+  padding: 22px;
+  border: 1px solid rgba(255,255,255,0.06);
+  backdrop-filter: blur(8px);
+}
+
+.modal-close {
+  float: right;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.wallet-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.wallet-item {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.04);
+  background: linear-gradient(90deg, rgba(255,255,255,0.02), transparent);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* صفحة التطبيق */
+.app-main {
+  display: flex;
+  gap: 20px;
+  padding: 28px;
+  min-height: 80vh;
+}
+
+.sidebar {
+  width: 220px;
+  position: relative;
+  z-index: 10;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.02);
+  color: #fff;
+  text-decoration: none;
+}
+
+.app-content {
+  flex: 1;
+  z-index: 10;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.card-small {
+  background: rgba(255,255,255,0.02);
+  padding: 18px;
+  border-radius: 10px;
+}
+
+@media (max-width: 780px) {
+  .site-header { padding: 12px; }
+  .hero-card { padding: 20px; }
+  .sidebar { display: none; }
+}
