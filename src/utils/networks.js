@@ -35,3 +35,28 @@ export const NETWORKS = {
     blockExplorerUrls: ["https://arbiscan.io"],
   },
 };
+import { NETWORKS } from "./networks";
+
+export async function switchNetwork(networkKey) {
+  if (!window.ethereum) {
+    alert("Please install MetaMask first.");
+    return;
+  }
+
+  const network = NETWORKS[networkKey];
+  try {
+    await window.ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: network.chainId }],
+    });
+  } catch (error) {
+    if (error.code === 4902) {
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [network],
+      });
+    } else {
+      console.error("Switch network error:", error);
+    }
+  }
+}
