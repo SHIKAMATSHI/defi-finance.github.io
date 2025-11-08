@@ -1,245 +1,88 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DEGI Finance</title>
-  <style>
-    /* --- RESET --- */
-    * {margin: 0; padding: 0; box-sizing: border-box;}
-    body, html {
-      width: 100%; height: 100%;
-      overflow-x: hidden;
-      font-family: "Poppins", sans-serif;
-      background: radial-gradient(circle at bottom, #2a2a2a 0%, #0b0b0b 70%);
-      color: white;
-      position: relative;
-    }
-
-    /* --- ANIMATED PARTICLES --- */
-    canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 0;
-    }
-
-    /* --- HEADER --- */
-    header {
-      position: fixed;
-      top: 0; right: 0;
-      width: 100%;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      padding: 20px 50px;
-      z-index: 10;
-      background: rgba(0,0,0,0.1);
-      backdrop-filter: blur(6px);
-    }
-    header a {
-      color: #ff3b3b;
-      text-decoration: none;
-      margin: 0 10px;
-      font-size: 18px;
-      transition: 0.3s;
-    }
-    header a:hover { color: #fff; }
-
-    .open-app {
-      margin-left: 20px;
-      background: rgba(255, 59, 59, 0.15);
-      border: 1px solid rgba(255, 59, 59, 0.6);
-      border-radius: 20px;
-      padding: 8px 18px;
-      color: #fff;
-      font-weight: 500;
-      cursor: pointer;
-      transition: 0.4s;
-      box-shadow: 0 0 8px rgba(255,59,59,0.3);
-    }
-    .open-app:hover {
-      background: rgba(255, 59, 59, 0.4);
-      transform: scale(1.05);
-      box-shadow: 0 0 16px rgba(255,59,59,0.6);
-    }
-
-    /* --- MAIN CONTENT --- */
-    .main {
-      position: relative;
-      z-index: 5;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-    }
-    .main h1 {
-      font-size: 4rem;
-      color: #ff4a4a;
-      text-shadow: 0 0 30px rgba(255,59,59,0.7);
-      margin-bottom: 10px;
-      letter-spacing: 2px;
-    }
-    .main h2 {
-      font-size: 1.5rem;
-      opacity: 0.9;
-      margin-bottom: 40px;
-    }
-
-    /* --- TYPEWRITER EFFECT --- */
-    #typewriter {
-      font-size: 1.3rem;
-      max-width: 700px;
-      border-right: 3px solid #ff4a4a;
-      white-space: nowrap;
-      overflow: hidden;
-      animation: typing 6s steps(60, end), blink 0.8s infinite;
-    }
-    @keyframes typing {
-      from { width: 0 }
-      to { width: 100% }
-    }
-    @keyframes blink {
-      50% { border-color: transparent }
-    }
-
-    /* --- SCROLL DOWN ICON --- */
-    .scroll-down {
-      position: absolute;
-      bottom: 40px;
-      animation: bounce 2s infinite;
-      cursor: pointer;
-      font-size: 2rem;
-      color: #ff4a4a;
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-
-    /* --- ABOUT SECTION --- */
-    .about {
-      background: rgba(0,0,0,0.8);
-      backdrop-filter: blur(8px);
-      padding: 100px 20px;
-      text-align: center;
-    }
-    .about h3 {
-      color: #ff4a4a;
-      font-size: 2rem;
-      margin-bottom: 20px;
-    }
-    .about p {
-      max-width: 800px;
-      margin: 0 auto;
-      line-height: 1.8;
-      font-size: 1.1rem;
-      color: #ddd;
-    }
-
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DegiSwap — Swap</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <canvas id="particles"></canvas>
+  <!-- canvas ثلاثي الأبعاد للجزيئات والدخان -->
+  <canvas id="bg"></canvas>
 
-  <header>
-    <a href="https://twitter.com/">Twitter</a>
-    <a href="https://discord.com/">Discord</a>
-    <a href="https://t.me/">Telegram</a>
-    <button class="open-app">Open App</button>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="left">
+      <div class="brand">
+        <div class="stacked">
+          <span class="D">D</span><span class="e">e</span>
+        </div>
+        <div class="brand-name">DegiSwap</div>
+      </div>
+    </div>
+
+    <div class="right">
+      <nav class="networks" aria-label="networks">
+        <!-- استخدمت أيقونات بسيطة؛ يمكنك استبدالها بصور SVG رسمية لاحقًا -->
+        <button class="net-btn" data-net="ethereum">Ξ <span>Ethereum</span></button>
+        <button class="net-btn" data-net="bsc">Ⓑ <span>BNB</span></button>
+        <button class="net-btn" data-net="polygon">◈ <span>Polygon</span></button>
+        <button class="net-btn" data-net="avalanche">Λ <span>Avalanche</span></button>
+        <button class="net-btn" data-net="arbitrum">A <span>Arbitrum</span></button>
+      </nav>
+
+      <div class="wallet-wrap">
+        <button id="connectBtn" class="connect-btn">Connect Wallet</button>
+        <div id="walletMenu" class="wallet-menu">
+          <button id="switchWallet">Switch Wallet</button>
+          <button id="logoutBtn">Logout</button>
+        </div>
+      </div>
+    </div>
   </header>
 
-  <div class="main">
-    <h1>DEGI Finance</h1>
-    <h2>The Future of Decentralized Wealth</h2>
-    <div id="typewriter"></div>
-    <div class="scroll-down" onclick="scrollToAbout()">⬇️</div>
-  </div>
+  <!-- خط نابض من اليمين (تحت زر المحفظة) إلى اليسار (تحت الشعار) -->
+  <div class="pulse-line"></div>
 
-  <section class="about" id="about">
-    <h3>About DEGI</h3>
-    <p>
-      DEGI is a decentralized finance (DeFi) protocol redefining digital finance through smart, automated solutions.
-      It empowers users to trade, earn, and manage assets with full transparency and freedom — without intermediaries.
-      Built on blockchain technology, DEGI combines simplicity, speed, and security for the next generation of financial innovation.
-    </p>
-  </section>
+  <!-- Swap box -->
+  <main class="main">
+    <section class="swap-card" role="region" aria-label="swap">
+      <h2 class="swap-title" id="swapTitle">SWAP</h2>
 
-  <script>
-    // --- PARTICLES BACKGROUND ---
-    const canvas = document.getElementById('particles');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+      <label class="row">
+        <div class="amount">
+          <input id="fromInput" type="number" placeholder="0.0" step="any" min="0" />
+        </div>
+        <button class="token-btn" id="fromTokenBtn"><small id="fromToken">ETH</small> ▾</button>
+      </label>
 
-    const particlesArray = [];
-    const colors = ['rgba(255,59,59,0.6)', 'rgba(255,59,59,0.3)'];
+      <div class="pct-row">
+        <button class="pct" data-pct="15">15%</button>
+        <button class="pct" data-pct="25">25%</button>
+        <button class="pct" data-pct="50">50%</button>
+        <button class="pct" data-pct="75">75%</button>
+        <button class="pct" data-pct="100">100%</button>
+        <button class="pct" id="maxBtn">MAX</button>
+      </div>
 
-    class Particle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2;
-        this.speedX = (Math.random() - 0.5) * 0.3;
-        this.speedY = (Math.random() - 0.5) * 0.3;
-        this.color = colors[Math.floor(Math.random() * colors.length)];
-      }
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-      }
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-      }
-    }
+      <label class="row">
+        <div class="amount">
+          <input id="toInput" type="number" placeholder="0.0" step="any" min="0" />
+        </div>
+        <button class="token-btn" id="toTokenBtn"><small id="toToken">DEGI</small> ▾</button>
+      </label>
 
-    function init() {
-      for (let i = 0; i < 150; i++) {
-        particlesArray.push(new Particle());
-      }
-    }
+      <div class="actions">
+        <button id="reverseBtn" class="reverse">⇅</button>
+        <button id="doSwap" class="action-btn">Connect Wallet</button>
+      </div>
+    </section>
+  </main>
 
-    function animate() {
-      ctx.fillStyle = "rgba(10,10,10,0.2)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      particlesArray.forEach(p => {
-        p.update();
-        p.draw();
-      });
-      requestAnimationFrame(animate);
-    }
+  <!-- token dropdowns (hidden) -->
+  <div id="tokenMenu" class="token-menu" aria-hidden="true"></div>
 
-    init();
-    animate();
-
-    // --- TYPEWRITER EFFECT ---
-    const text = "Welcome to DEGI — The Future of Decentralized Finance.";
-    let i = 0;
-    function typing() {
-      if (i < text.length) {
-        document.getElementById("typewriter").textContent += text.charAt(i);
-        i++;
-        setTimeout(typing, 50);
-      }
-    }
-    window.onload = typing;
-
-    // --- SCROLL FUNCTION ---
-    function scrollToAbout() {
-      document.getElementById("about").scrollIntoView({ behavior: "smooth" });
-    }
-
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    });
-  </script>
+  <script src="https://unpkg.com/three@0.154.0/build/three.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
